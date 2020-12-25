@@ -37,8 +37,10 @@ def check_flood(update, context) -> str:
             user.id in TIGER_USERS):
         sql.update_flood(chat.id, None)
         return ""
+    # ignore approved users
     if is_approved(chat.id, user.id):
-         return
+        sql.update_flood(chat.id, None)
+        return ""
     should_ban = sql.update_flood(chat.id, user.id)
     if not should_ban:
         return ""
@@ -93,7 +95,8 @@ def check_flood(update, context) -> str:
         sql.set_flood(chat.id, 0)
         return "<b>{}:</b>" \
                "\n#INFO" \
-               "\nDon't have enough permission to restrict users so automatically disabled anti-flood".format(chat.title)
+               "\nDon't have enough permission to restrict users so automatically disabled anti-flood".format(
+                   chat.title)
 
 
 @run_async
@@ -166,7 +169,8 @@ def set_flood(update, context) -> str:
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
                        "\n<b>Admin:</b> {}" \
-                       "\nDisable antiflood.".format(html.escape(chat_name), mention_html(user.id, user.first_name))
+                       "\nDisable antiflood.".format(html.escape(
+                           chat_name), mention_html(user.id, user.first_name))
 
             elif amount < 3:
                 send_message(
@@ -198,7 +202,7 @@ def set_flood(update, context) -> str:
         message.reply_text((
             "Use `/setflood number` to enable anti-flood.\nOr use `/setflood off` to disable antiflood!."
         ),
-                           parse_mode="markdown")
+            parse_mode="markdown")
     return ""
 
 
@@ -303,9 +307,9 @@ Examples of time value: 4m = 4 minutes, 3h = 3 hours, 6d = 6 days, 5w = 5 weeks.
                 "Exceeding consecutive flood limit will result in {}!".format(
                     settypeflood))
         return "<b>{}:</b>\n" \
-                "<b>Admin:</b> {}\n" \
-                "Has changed antiflood mode. User will {}.".format(settypeflood, html.escape(chat.title),
-                                                                            mention_html(user.id, user.first_name))
+            "<b>Admin:</b> {}\n" \
+            "Has changed antiflood mode. User will {}.".format(settypeflood, html.escape(chat.title),
+                                                               mention_html(user.id, user.first_name))
     else:
         getmode, getvalue = sql.get_flood_setting(chat.id)
         if getmode == 1:
@@ -366,9 +370,10 @@ __mod_name__ = "Anti-Flood"
 
 FLOOD_BAN_HANDLER = MessageHandler(
     Filters.all & ~Filters.status_update & Filters.group, check_flood)
-SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, filters=Filters.group)
+SET_FLOOD_HANDLER = CommandHandler(
+    "setflood", set_flood, filters=Filters.group)
 SET_FLOOD_MODE_HANDLER = CommandHandler(
-    "setfloodmode", set_flood_mode, pass_args=True)  #, filters=Filters.group)
+    "setfloodmode", set_flood_mode, pass_args=True)  # , filters=Filters.group)
 FLOOD_QUERY_HANDLER = CallbackQueryHandler(
     flood_button, pattern=r"unmute_flooder")
 FLOOD_HANDLER = CommandHandler("flood", flood, filters=Filters.group)
