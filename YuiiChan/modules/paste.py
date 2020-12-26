@@ -12,43 +12,44 @@ def paste(update: Update, context: CallbackContext):
     message = update.effective_message
     if not message.reply_to_message:
         try:
-          data = message.text.split(None, 1)[1]
+            data = message.text.split(None, 1)[1]
         except:
-          message.reply_text("What am I supposed to paste?")
-          return
+            message.reply_text("What am I supposed to paste?")
+            return
     else:
 
-      if message.reply_to_message.text:
-          data = message.reply_to_message.text
-    
-      elif message.reply_to_message.document:
-        document_id = message.reply_to_message.document.file_id
-        file = context.bot.get_file(document_id)
-        file.download("paste.txt")
-        with open("paste.txt", "rb") as fd:
+        if message.reply_to_message.text:
+            data = message.reply_to_message.text
+
+        elif message.reply_to_message.document:
+            document_id = message.reply_to_message.document.file_id
+            file = context.bot.get_file(document_id)
+            file.download("paste.txt")
+            with open("paste.txt", "rb") as fd:
                 m_list = fd.readlines()
                 data = ""
                 for m in m_list:
                     data += m.decode("UTF-8")
-        os.remove("paste.txt")
-        
-      else:
-        message.reply_text("Error parsing paste content.")
-        return
+            os.remove("paste.txt")
 
-    key = requests.post(
-        'https://nekobin.com/api/documents', json={
-            "content": data
-        }).json().get('result').get('key')
+        else:
+            message.reply_text("Error parsing paste content.")
+            return
 
-    url = f'https://nekobin.com/{key}'
+    key = (
+        requests.post("https://nekobin.com/api/documents", json={"content": data})
+        .json()
+        .get("result")
+        .get("key")
+    )
 
-    reply_text = f'Nekofied to *Nekobin* : {url}'
+    url = f"https://nekobin.com/{key}"
+
+    reply_text = f"Nekofied to *Nekobin* : {url}"
 
     message.reply_text(
-        reply_text,
-        parse_mode=ParseMode.MARKDOWN,
-        disable_web_page_preview=True)
+        reply_text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
+    )
 
 
 __help__ = """

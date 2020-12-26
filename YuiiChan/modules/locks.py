@@ -5,58 +5,65 @@ import telegram.ext as tg
 from YuiiChan import DEV_USERS, LOGGER, SUDO_USERS, dispatcher
 from YuiiChan.modules.disable import DisableAbleCommandHandler
 from YuiiChan.modules.helper_funcs.chat_status import (
-    bot_can_delete, can_delete, connection_status, is_bot_admin, is_user_admin,
-    user_admin, user_not_admin)
+    bot_can_delete,
+    can_delete,
+    connection_status,
+    is_bot_admin,
+    is_user_admin,
+    user_admin,
+    user_not_admin,
+)
 from YuiiChan.modules.helper_funcs.filters import CustomFilters
 from YuiiChan.modules.log_channel import loggable
 from telegram import MessageEntity, ParseMode, TelegramError, Update
 from telegram.error import BadRequest
-from telegram.ext import (CallbackContext, CommandHandler, Filters,
-                          MessageHandler, run_async)
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    Filters,
+    MessageHandler,
+    run_async,
+)
 from telegram.utils.helpers import mention_html
 from YuiiChan.modules.sql.approve_sql import is_approved
+
 LOCK_TYPES = {
-    'sticker':
-        Filters.sticker,
-    'audio':
-        Filters.audio,
-    'voice':
-        Filters.voice,
-    'document':
-        Filters.document,
-    'video':
-        Filters.video,
-    'contact':
-        Filters.contact,
-    'photo':
-        Filters.photo,
-    'gif':
-        Filters.document & CustomFilters.mime_type("video/mp4"),
-    'url':
-        Filters.entity(MessageEntity.URL)
-        | Filters.caption_entity(MessageEntity.URL),
-    'bots':
-        Filters.status_update.new_chat_members,
-    'forward':
-        Filters.forwarded,
-    'game':
-        Filters.game,
-    'location':
-        Filters.location,
+    "sticker": Filters.sticker,
+    "audio": Filters.audio,
+    "voice": Filters.voice,
+    "document": Filters.document,
+    "video": Filters.video,
+    "contact": Filters.contact,
+    "photo": Filters.photo,
+    "gif": Filters.document & CustomFilters.mime_type("video/mp4"),
+    "url": Filters.entity(MessageEntity.URL)
+    | Filters.caption_entity(MessageEntity.URL),
+    "bots": Filters.status_update.new_chat_members,
+    "forward": Filters.forwarded,
+    "game": Filters.game,
+    "location": Filters.location,
 }
 
 GIF = Filters.document & CustomFilters.mime_type("video/mp4")
 OTHER = Filters.game | Filters.sticker | GIF
 MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filters.photo
-MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | Filters.command | MEDIA | OTHER
+MESSAGES = (
+    Filters.text
+    | Filters.contact
+    | Filters.location
+    | Filters.venue
+    | Filters.command
+    | MEDIA
+    | OTHER
+)
 PREVIEWS = Filters.entity("url")
 
 RESTRICTION_TYPES = {
-    'messages': MESSAGES,
-    'media': MEDIA,
-    'other': OTHER,
+    "messages": MESSAGES,
+    "media": MEDIA,
+    "other": OTHER,
     # 'previews': PREVIEWS, # NOTE: this has been removed cos its useless atm.
-    'all': Filters.all
+    "all": Filters.all,
 }
 
 PERM_GROUP = 1
@@ -64,27 +71,23 @@ REST_GROUP = 2
 
 
 class CustomCommandHandler(tg.CommandHandler):
-
     def __init__(self, command, callback, **kwargs):
         super().__init__(command, callback, **kwargs)
 
     def check_update(self, update):
         return super().check_update(update) and not (
-            sql.is_restr_locked(update.effective_chat.id, 'messages') and
-            not is_user_admin(update.effective_chat, update.effective_user.id))
+            sql.is_restr_locked(update.effective_chat.id, "messages")
+            and not is_user_admin(update.effective_chat, update.effective_user.id)
+        )
 
 
 tg.CommandHandler = CustomCommandHandler
 
 
 # NOT ASYNC
-def restr_members(bot,
-                  chat_id,
-                  members,
-                  messages=False,
-                  media=False,
-                  other=False,
-                  previews=False):
+def restr_members(
+    bot, chat_id, members, messages=False, media=False, other=False, previews=False
+):
     for mem in members:
         if mem.user in SUDO_USERS or mem.user in DEV_USERS:
             pass
@@ -95,19 +98,16 @@ def restr_members(bot,
                 can_send_messages=messages,
                 can_send_media_messages=media,
                 can_send_other_messages=other,
-                can_add_web_page_previews=previews)
+                can_add_web_page_previews=previews,
+            )
         except TelegramError:
             pass
 
 
 # NOT ASYNC
-def unrestr_members(bot,
-                    chat_id,
-                    members,
-                    messages=True,
-                    media=True,
-                    other=True,
-                    previews=True):
+def unrestr_members(
+    bot, chat_id, members, messages=True, media=True, other=True, previews=True
+):
     for mem in members:
         try:
             bot.restrict_chat_member(
@@ -116,7 +116,8 @@ def unrestr_members(bot,
                 can_send_messages=messages,
                 can_send_media_messages=media,
                 can_send_other_messages=other,
-                can_add_web_page_previews=previews)
+                can_add_web_page_previews=previews,
+            )
         except TelegramError:
             pass
 
@@ -125,7 +126,8 @@ def unrestr_members(bot,
 @connection_status
 def locktypes(update: Update, context: CallbackContext):
     update.effective_message.reply_text(
-        "\n - ".join(["Locks: "] + list(LOCK_TYPES) + list(RESTRICTION_TYPES)))
+        "\n - ".join(["Locks: "] + list(LOCK_TYPES) + list(RESTRICTION_TYPES))
+    )
 
 
 @user_admin
@@ -143,13 +145,15 @@ def lock(update: Update, context: CallbackContext) -> str:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=True)
                 message.reply_text(
-                    "Locked {} messages for all non-admins!".format(args[0]))
+                    "Locked {} messages for all non-admins!".format(args[0])
+                )
 
                 return (
                     f"<b>{html.escape(chat.title)}:</b>\n"
                     f"#LOCK\n"
                     f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
-                    f"Locked <code>{args[0]}</code>.")
+                    f"Locked <code>{args[0]}</code>."
+                )
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
@@ -169,13 +173,13 @@ def lock(update: Update, context: CallbackContext) -> str:
                 elif args[0] == "all":
                     chat.set_permissions(can_send_messages=False)
                 """
-                message.reply_text("Locked {} for all non-admins!".format(
-                    args[0]))
+                message.reply_text("Locked {} for all non-admins!".format(args[0]))
                 return (
                     f"<b>{html.escape(chat.title)}:</b>\n"
                     f"#LOCK\n"
                     f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
-                    f"Locked <code>{args[0]}</code>.")
+                    f"Locked <code>{args[0]}</code>."
+                )
 
             else:
                 message.reply_text(
@@ -183,8 +187,7 @@ def lock(update: Update, context: CallbackContext) -> str:
                 )
 
     else:
-        message.reply_text(
-            "I'm not an administrator, or haven't got delete rights.")
+        message.reply_text("I'm not an administrator, or haven't got delete rights.")
 
     return ""
 
@@ -208,7 +211,8 @@ def unlock(update: Update, context: CallbackContext) -> str:
                     f"<b>{html.escape(chat.title)}:</b>\n"
                     f"#UNLOCK\n"
                     f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
-                    f"Unlocked <code>{args[0]}</code>.")
+                    f"Unlocked <code>{args[0]}</code>."
+                )
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=False)
@@ -235,7 +239,8 @@ def unlock(update: Update, context: CallbackContext) -> str:
                     f"<b>{html.escape(chat.title)}:</b>\n"
                     f"#UNLOCK\n"
                     f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
-                    f"Unlocked <code>{args[0]}</code>.")
+                    f"Unlocked <code>{args[0]}</code>."
+                )
             else:
                 message.reply_text(
                     "What are you trying to unlock...? Try /locktypes for the list of lockables"
@@ -254,15 +259,18 @@ def del_lockables(update: Update, context: CallbackContext):
     chat = update.effective_chat
     message = update.effective_message
     user = update.effective_user
-    #filter() expects Update object when filters are merged, otherwise Message object
+    # filter() expects Update object when filters are merged, otherwise Message object
     chk = message
     if is_approved(chat.id, user.id):
-         return
+        return
     for lockable, filter in LOCK_TYPES.items():
-        if lockable in ('gif', 'url'):
+        if lockable in ("gif", "url"):
             chk = update
-        if filter(update) and sql.is_locked(chat.id, lockable) and can_delete(
-                chat, bot.id):
+        if (
+            filter(update)
+            and sql.is_locked(chat.id, lockable)
+            and can_delete(chat, bot.id)
+        ):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
                 for new_mem in new_members:
@@ -270,7 +278,8 @@ def del_lockables(update: Update, context: CallbackContext):
                         if not is_bot_admin(chat, bot.id):
                             message.reply_text(
                                 "I see a bot, and I've been told to stop them joining... "
-                                "but I'm not admin!")
+                                "but I'm not admin!"
+                            )
                             return
 
                         chat.kick_member(new_mem.id)
@@ -296,15 +305,18 @@ def rest_handler(update: Update, context: CallbackContext):
     msg = update.effective_message
     chat = update.effective_chat
 
-    #filter() expects Update object when filters are merged, otherwise Message object
+    # filter() expects Update object when filters are merged, otherwise Message object
     _chk = msg
 
     for restriction, _filter in RESTRICTION_TYPES.items():
-        if restriction != 'all':
+        if restriction != "all":
             # all others are merged filters
             _chk = update
-        if _filter(update) and sql.is_restr_locked(
-                chat.id, restriction) and can_delete(chat, bot.id):
+        if (
+            _filter(update)
+            and sql.is_restr_locked(chat.id, restriction)
+            and can_delete(chat, bot.id)
+        ):
             try:
                 msg.delete()
             except BadRequest as excp:
@@ -317,25 +329,35 @@ def rest_handler(update: Update, context: CallbackContext):
 
 def format_lines(lst, spaces):
     widths = [
-        max([len(str(lst[i][j]))
-             for i in range(len(lst))])
-        for j in range(len(lst[0]))
+        max([len(str(lst[i][j])) for i in range(len(lst))]) for j in range(len(lst[0]))
     ]
 
-    lines = [(" " * spaces).join([
-        " " * int((widths[i] - len(str(r[i]))) / 2) + str(r[i]) + " " * int(
-            (widths[i] - len(str(r[i])) +
-             (1 if widths[i] % 2 != len(str(r[i])) % 2 else 0)) / 2)
-        for i in range(len(r))
-    ])
-             for r in lst]
+    lines = [
+        (" " * spaces).join(
+            [
+                " " * int((widths[i] - len(str(r[i]))) / 2)
+                + str(r[i])
+                + " "
+                * int(
+                    (
+                        widths[i]
+                        - len(str(r[i]))
+                        + (1 if widths[i] % 2 != len(str(r[i])) % 2 else 0)
+                    )
+                    / 2
+                )
+                for i in range(len(r))
+            ]
+        )
+        for r in lst
+    ]
 
     return "\n".join(lines)
 
 
 def repl(lst, index, true_val, false_val):
     return [
-        t[0:index] + [true_val if t[index] else false_val] + t[index + 1:len(t)]
+        t[0:index] + [true_val if t[index] else false_val] + t[index + 1 : len(t)]
         for t in lst
     ]
 
@@ -351,23 +373,42 @@ def build_lock_message(chat_id):
         ls = []
         if locks:
             ls += repl(
-                [["sticker", "=", locks.sticker], ["audio", "=", locks.audio],
-                 ["voice", "=", locks.voice], ["document", "=", locks.document],
-                 ["video", "=", locks.video], ["contact", "=", locks.contact],
-                 ["photo", "=", locks.photo], ["gif", "=", locks.gif],
-                 ["url", "=", locks.url], ["bots", "=", locks.bots],
-                 ["forward", "=", locks.forward], ["game", "=", locks.game],
-                 ["location", "=", locks.location]], 2, "Locked", "Unlocked")
+                [
+                    ["sticker", "=", locks.sticker],
+                    ["audio", "=", locks.audio],
+                    ["voice", "=", locks.voice],
+                    ["document", "=", locks.document],
+                    ["video", "=", locks.video],
+                    ["contact", "=", locks.contact],
+                    ["photo", "=", locks.photo],
+                    ["gif", "=", locks.gif],
+                    ["url", "=", locks.url],
+                    ["bots", "=", locks.bots],
+                    ["forward", "=", locks.forward],
+                    ["game", "=", locks.game],
+                    ["location", "=", locks.location],
+                ],
+                2,
+                "Locked",
+                "Unlocked",
+            )
         if restr:
             ls += repl(
-                [["messages", "=", restr.messages], ["media", "=", restr.media],
-                 ["other", "=", restr.other], ["previews", "=", restr.preview],
-                 [
-                     "all", "=",
-                     all([
-                         restr.messages, restr.media, restr.other, restr.preview
-                     ])
-                 ]], 2, "Restricted", "Unrestricted")
+                [
+                    ["messages", "=", restr.messages],
+                    ["media", "=", restr.media],
+                    ["other", "=", restr.other],
+                    ["previews", "=", restr.preview],
+                    [
+                        "all",
+                        "=",
+                        all([restr.messages, restr.media, restr.other, restr.preview]),
+                    ],
+                ],
+                2,
+                "Restricted",
+                "Unrestricted",
+            )
         # DON'T REMOVE THE NEWLINE BELOW
         res += "```\n" + format_lines(ls, 1) + "```"
     return res
@@ -423,6 +464,10 @@ dispatcher.add_handler(RESTRICTION_HANDLER, REST_GROUP)
 
 __mod_name__ = "Locks"
 __handlers__ = [
-    LOCKTYPES_HANDLER, LOCK_HANDLER, UNLOCK_HANDLER, LOCKED_HANDLER,
-    (LOCKABLE_HANDLER, PERM_GROUP), (RESTRICTION_HANDLER, REST_GROUP)
+    LOCKTYPES_HANDLER,
+    LOCK_HANDLER,
+    UNLOCK_HANDLER,
+    LOCKED_HANDLER,
+    (LOCKABLE_HANDLER, PERM_GROUP),
+    (RESTRICTION_HANDLER, REST_GROUP),
 ]

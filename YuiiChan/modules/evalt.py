@@ -12,20 +12,25 @@ import asyncio
 import sys
 import io
 
+
 @telethn.on(events.NewMessage(pattern="^/eval"))
 async def _(event):
     if event.fwd_from or event.via_bot_id:
         return
     if not event.from_id in DEV_USERS:
-    	await event.reply("This is a developer restricted command. You don't have permission to use it!")
-    	return
+        await event.reply(
+            "This is a developer restricted command. You don't have permission to use it!"
+        )
+        return
     try:
-      cmd = event.text.split(" ", maxsplit=1)[1]
+        cmd = event.text.split(" ", maxsplit=1)[1]
     except IndexError:
         await event.reply("What to evaluate?")
         return
-    
-    x = await event.client.send_message(event.chat_id, "Processing...", reply_to=event.message)
+
+    x = await event.client.send_message(
+        event.chat_id, "Processing...", reply_to=event.message
+    )
     reply_to_id = event.message.id
     if event.reply_to_msg_id:
         reply_to_id = event.reply_to_msg_id
@@ -67,7 +72,7 @@ async def _(event):
                 force_document=True,
                 allow_cache=False,
                 caption=cmd,
-                reply_to=reply_to_id
+                reply_to=reply_to_id,
             )
             await event.client.delete_messages(event.chat_id, x.id)
     else:
@@ -75,8 +80,5 @@ async def _(event):
 
 
 async def aexec(code, event):
-    exec(
-        f'async def __aexec(event): ' +
-        ''.join(f'\n {l}' for l in code.split('\n'))
-    )
-    return await locals()['__aexec'](event)
+    exec(f"async def __aexec(event): " + "".join(f"\n {l}" for l in code.split("\n")))
+    return await locals()["__aexec"](event)

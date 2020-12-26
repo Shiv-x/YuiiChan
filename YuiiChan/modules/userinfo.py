@@ -13,8 +13,17 @@ from telegram.ext.dispatcher import run_async
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown, mention_html
 
-from YuiiChan import (DEV_USERS, OWNER_ID, SUDO_USERS, SUPPORT_USERS,
-                          TIGER_USERS, WHITELIST_USERS, INFOPIC, dispatcher, sw)
+from YuiiChan import (
+    DEV_USERS,
+    OWNER_ID,
+    SUDO_USERS,
+    SUPPORT_USERS,
+    TIGER_USERS,
+    WHITELIST_USERS,
+    INFOPIC,
+    dispatcher,
+    sw,
+)
 from YuiiChan.__main__ import STATS, TOKEN, USER_INFO
 import YuiiChan.modules.sql.userinfo_sql as sql
 from YuiiChan.modules.disable import DisableAbleCommandHandler
@@ -24,7 +33,12 @@ from YuiiChan.modules.sql.users_sql import get_user_num_chats
 from YuiiChan.modules.sql.feds_sql import get_user_fbanlist
 from YuiiChan.modules.helper_funcs.chat_status import sudo_plus
 from YuiiChan.modules.helper_funcs.extraction import extract_user
-from YuiiChan import telethn as SaitamaTelethonClient, TIGER_USERS, SUDO_USERS, SUPPORT_USERS
+from YuiiChan import (
+    telethn as SaitamaTelethonClient,
+    TIGER_USERS,
+    SUDO_USERS,
+    SUPPORT_USERS,
+)
 
 
 def no_by_per(totalhp, percentage):
@@ -99,7 +113,7 @@ def hpmanager(user):
     return {
         "earnedhp": int(new_hp),
         "totalhp": int(total_hp),
-        "percentage": get_percentage(total_hp, new_hp)
+        "percentage": get_percentage(total_hp, new_hp),
     }
 
 
@@ -127,42 +141,46 @@ def get_id(update: Update, context: CallbackContext):
                 f"<b>Telegram ID:</b>,"
                 f"• {html.escape(user2.first_name)} - <code>{user2.id}</code>.\n"
                 f"• {html.escape(user1.first_name)} - <code>{user1.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                parse_mode=ParseMode.HTML,
+            )
 
         else:
 
             user = bot.get_chat(user_id)
             msg.reply_text(
                 f"{html.escape(user.first_name)}'s id is <code>{user.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                parse_mode=ParseMode.HTML,
+            )
 
     else:
 
         if chat.type == "private":
             msg.reply_text(
-                f"Your id is <code>{chat.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                f"Your id is <code>{chat.id}</code>.", parse_mode=ParseMode.HTML
+            )
 
         else:
             msg.reply_text(
-                f"This group's id is <code>{chat.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                f"This group's id is <code>{chat.id}</code>.", parse_mode=ParseMode.HTML
+            )
 
 
 @SaitamaTelethonClient.on(
     events.NewMessage(
-        pattern='/ginfo ',
-        from_users=(TIGER_USERS or []) + (SUDO_USERS or []) +
-        (SUPPORT_USERS or [])))
+        pattern="/ginfo ",
+        from_users=(TIGER_USERS or []) + (SUDO_USERS or []) + (SUPPORT_USERS or []),
+    )
+)
 async def group_info(event) -> None:
-    chat = event.text.split(' ', 1)[1]
+    chat = event.text.split(" ", 1)[1]
     try:
         entity = await event.client.get_entity(chat)
         totallist = await event.client.get_participants(
-            chat, filter=ChannelParticipantsAdmins)
+            chat, filter=ChannelParticipantsAdmins
+        )
     except:
         await event.reply(
-            'The channel specified is private and **I lack permission to access it**. Another reason may be that **I am banned from it**'
+            "The channel specified is private and **I lack permission to access it**. Another reason may be that **I am banned from it**"
         )
         return
     msg = f"**ID**: `{entity.id}`"
@@ -192,10 +210,10 @@ def gifid(update: Update, context: CallbackContext):
     if msg.reply_to_message and msg.reply_to_message.animation:
         update.effective_message.reply_text(
             f"Gif ID:\n<code>{msg.reply_to_message.animation.file_id}</code>",
-            parse_mode=ParseMode.HTML)
+            parse_mode=ParseMode.HTML,
+        )
     else:
-        update.effective_message.reply_text(
-            "Please reply to a gif to get its ID.")
+        update.effective_message.reply_text("Please reply to a gif to get its ID.")
 
 
 @run_async
@@ -212,22 +230,27 @@ def info(update: Update, context: CallbackContext):
         user = message.from_user
 
     elif not message.reply_to_message and (
-            not args or
-        (len(args) >= 1 and not args[0].startswith("@") and
-         not args[0].isdigit() and
-         not message.parse_entities([MessageEntity.TEXT_MENTION]))):
+        not args
+        or (
+            len(args) >= 1
+            and not args[0].startswith("@")
+            and not args[0].isdigit()
+            and not message.parse_entities([MessageEntity.TEXT_MENTION])
+        )
+    ):
         message.reply_text("I can't extract a user from this.")
         return
 
     else:
         return
 
-    rep = message.reply_text(
-        "<code>Appraising...</code>", parse_mode=ParseMode.HTML)
+    rep = message.reply_text("<code>Appraising...</code>", parse_mode=ParseMode.HTML)
 
-    text = (f"╒═══「<b> Appraisal results:</b>」\n\n"
-            f"ID: <code>{user.id}</code>\n"
-            f"First Name: {html.escape(user.first_name)}")
+    text = (
+        f"╒═══「<b> Appraisal results:</b>」\n\n"
+        f"ID: <code>{user.id}</code>\n"
+        f"First Name: {html.escape(user.first_name)}"
+    )
 
     if user.last_name:
         text += f"\nLast Name: {html.escape(user.last_name)}"
@@ -268,7 +291,7 @@ def info(update: Update, context: CallbackContext):
         pass  # don't crash if api is down somehow...
 
     disaster_level_present = False
-    
+
     if user.id == OWNER_ID:
         text += "\n\nThis person is 'God'."
         disaster_level_present = True
@@ -290,17 +313,18 @@ def info(update: Update, context: CallbackContext):
 
     if disaster_level_present:
         text += ' [<a href="https://t.me/yuiichansupport/3655">?</a>]'.format(
-            bot.username)
+            bot.username
+        )
 
     try:
         user_member = chat.get_member(user.id)
-        if user_member.status == 'administrator':
+        if user_member.status == "administrator":
             result = requests.post(
                 f"https://api.telegram.org/bot{TOKEN}/getChatMember?chat_id={chat.id}&user_id={user.id}"
             )
             result = result.json()["result"]
             if "custom_title" in result.keys():
-                custom_title = result['custom_title']
+                custom_title = result["custom_title"]
                 text += f"\n\nTitle:\n<b>{custom_title}</b>"
     except BadRequest:
         pass
@@ -323,17 +347,20 @@ def info(update: Update, context: CallbackContext):
                 document=open(f"{user.id}.png", "rb"),
                 caption=(text),
                 parse_mode=ParseMode.HTML,
-                disable_web_page_preview=True)
+                disable_web_page_preview=True,
+            )
 
             os.remove(f"{user.id}.png")
         # Incase user don't have profile pic, send normal text
         except IndexError:
             message.reply_text(
-                text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+                text, parse_mode=ParseMode.HTML, disable_web_page_preview=True
+            )
 
     else:
         message.reply_text(
-            text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+            text, parse_mode=ParseMode.HTML, disable_web_page_preview=True
+        )
 
     rep.delete()
 
@@ -354,14 +381,15 @@ def about_me(update: Update, context: CallbackContext):
     if info:
         update.effective_message.reply_text(
             f"*{user.first_name}*:\n{escape_markdown(info)}",
-            parse_mode=ParseMode.MARKDOWN)
+            parse_mode=ParseMode.MARKDOWN,
+        )
     elif message.reply_to_message:
         username = message.reply_to_message.from_user.first_name
         update.effective_message.reply_text(
-            f"{username} hasn't set an info message about themselves yet!")
+            f"{username} hasn't set an info message about themselves yet!"
+        )
     else:
-        update.effective_message.reply_text(
-            "There isnt one, use /setme to set one.")
+        update.effective_message.reply_text("There isnt one, use /setme to set one.")
 
 
 @run_async
@@ -372,8 +400,7 @@ def set_about_me(update: Update, context: CallbackContext):
     if message.reply_to_message:
         repl_message = message.reply_to_message
         repl_user_id = repl_message.from_user.id
-        if repl_user_id == bot.id and (user_id in SUDO_USERS or
-                                       user_id in DEV_USERS):
+        if repl_user_id == bot.id and (user_id in SUDO_USERS or user_id in DEV_USERS):
             user_id = repl_user_id
 
     text = message.text
@@ -383,21 +410,22 @@ def set_about_me(update: Update, context: CallbackContext):
         if len(info[1]) < MAX_MESSAGE_LENGTH // 4:
             sql.set_user_me_info(user_id, info[1])
             if user_id == bot.id:
-                message.reply_text(
-                    "I have updated my info with the one you provided!")
+                message.reply_text("I have updated my info with the one you provided!")
             else:
                 message.reply_text("Information updated!")
         else:
             message.reply_text(
                 "The info needs to be under {} characters! You have {}.".format(
-                    MAX_MESSAGE_LENGTH // 4, len(info[1])))
+                    MAX_MESSAGE_LENGTH // 4, len(info[1])
+                )
+            )
 
 
 @run_async
 @sudo_plus
 def stats(update: Update, context: CallbackContext):
     stats = "Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS])
-    result = re.sub(r'(\d+)', r'<code>\1</code>', stats)
+    result = re.sub(r"(\d+)", r"<code>\1</code>", stats)
     update.effective_message.reply_text(result, parse_mode=ParseMode.HTML)
 
 
@@ -417,7 +445,8 @@ def about_bio(update: Update, context: CallbackContext):
     if info:
         update.effective_message.reply_text(
             "*{}*:\n{}".format(user.first_name, escape_markdown(info)),
-            parse_mode=ParseMode.MARKDOWN)
+            parse_mode=ParseMode.MARKDOWN,
+        )
     elif message.reply_to_message:
         username = user.first_name
         update.effective_message.reply_text(
@@ -425,7 +454,8 @@ def about_bio(update: Update, context: CallbackContext):
         )
     else:
         update.effective_message.reply_text(
-            "You haven't had a bio set about yourself yet!")
+            "You haven't had a bio set about yourself yet!"
+        )
 
 
 @run_async
@@ -444,9 +474,14 @@ def set_about_bio(update: Update, context: CallbackContext):
             )
             return
 
-        if user_id == bot.id and sender_id not in SUDO_USERS and sender_id not in DEV_USERS:
+        if (
+            user_id == bot.id
+            and sender_id not in SUDO_USERS
+            and sender_id not in DEV_USERS
+        ):
             message.reply_text(
-                "Erm... yeah, I only trust YuiChanClub members to set my bio.")
+                "Erm... yeah, I only trust YuiChanClub members to set my bio."
+            )
             return
 
         text = message.text
@@ -457,12 +492,15 @@ def set_about_bio(update: Update, context: CallbackContext):
         if len(bio) == 2:
             if len(bio[1]) < MAX_MESSAGE_LENGTH // 4:
                 sql.set_user_bio(user_id, bio[1])
-                message.reply_text("Updated {}'s bio!".format(
-                    repl_message.from_user.first_name))
+                message.reply_text(
+                    "Updated {}'s bio!".format(repl_message.from_user.first_name)
+                )
             else:
                 message.reply_text(
-                    "Bio needs to be under {} characters! You tried to set {}."
-                    .format(MAX_MESSAGE_LENGTH // 4, len(bio[1])))
+                    "Bio needs to be under {} characters! You tried to set {}.".format(
+                        MAX_MESSAGE_LENGTH // 4, len(bio[1])
+                    )
+                )
     else:
         message.reply_text("Reply to someone to set their bio!")
 
@@ -525,6 +563,12 @@ dispatcher.add_handler(GET_ABOUT_HANDLER)
 __mod_name__ = "Info"
 __command_list__ = ["setbio", "bio", "setme", "me", "info"]
 __handlers__ = [
-    ID_HANDLER, GIFID_HANDLER, INFO_HANDLER, SET_BIO_HANDLER, GET_BIO_HANDLER,
-    SET_ABOUT_HANDLER, GET_ABOUT_HANDLER, STATS_HANDLER
+    ID_HANDLER,
+    GIFID_HANDLER,
+    INFO_HANDLER,
+    SET_BIO_HANDLER,
+    GET_BIO_HANDLER,
+    SET_ABOUT_HANDLER,
+    GET_ABOUT_HANDLER,
+    STATS_HANDLER,
 ]

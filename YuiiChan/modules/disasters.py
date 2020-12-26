@@ -3,19 +3,28 @@ import json
 import os
 from typing import Optional
 
-from YuiiChan import (DEV_USERS, OWNER_ID, SUDO_USERS, SUPPORT_CHAT,
-                          SUPPORT_USERS, TIGER_USERS, WHITELIST_USERS,
-                          dispatcher)
-from YuiiChan.modules.helper_funcs.chat_status import (dev_plus, sudo_plus,
-                                                           whitelist_plus)
+from YuiiChan import (
+    DEV_USERS,
+    OWNER_ID,
+    SUDO_USERS,
+    SUPPORT_CHAT,
+    SUPPORT_USERS,
+    TIGER_USERS,
+    WHITELIST_USERS,
+    dispatcher,
+)
+from YuiiChan.modules.helper_funcs.chat_status import (
+    dev_plus,
+    sudo_plus,
+    whitelist_plus,
+)
 from YuiiChan.modules.helper_funcs.extraction import extract_user
 from YuiiChan.modules.log_channel import gloggable
 from telegram import ParseMode, TelegramError, Update
 from telegram.ext import CallbackContext, CommandHandler, run_async
 from telegram.utils.helpers import mention_html
 
-ELEVATED_USERS_FILE = os.path.join(os.getcwd(),
-                                   'YuiiChan/elevated_users.json')
+ELEVATED_USERS_FILE = os.path.join(os.getcwd(), "YuiiChan/elevated_users.json")
 
 
 def check_user_id(user_id: int, context: CallbackContext) -> Optional[str]:
@@ -31,11 +40,11 @@ def check_user_id(user_id: int, context: CallbackContext) -> Optional[str]:
     return reply
 
 
-
 # do not async, not a handler
 def send_disasters(update):
     update.effective_message.reply_text(
-        disasters, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+        disasters, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
+    )
 
 
 @run_async
@@ -55,7 +64,7 @@ def addsudo(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
@@ -64,30 +73,31 @@ def addsudo(update: Update, context: CallbackContext) -> str:
 
     if user_id in SUPPORT_USERS:
         rt += "Requested bot Admins to promote."
-        data['supports'].remove(user_id)
+        data["supports"].remove(user_id)
         SUPPORT_USERS.remove(user_id)
 
     if user_id in WHITELIST_USERS:
         rt += "Requested bot Admins to promote."
-        data['whitelists'].remove(user_id)
+        data["whitelists"].remove(user_id)
         WHITELIST_USERS.remove(user_id)
 
-    data['sudos'].append(user_id)
+    data["sudos"].append(user_id)
     SUDO_USERS.append(user_id)
 
-    with open(ELEVATED_USERS_FILE, 'w') as outfile:
+    with open(ELEVATED_USERS_FILE, "w") as outfile:
         json.dump(data, outfile, indent=4)
 
     update.effective_message.reply_text(
-        rt + "\nSuccessfully promoted {} to sudo!".format(
-            user_member.first_name))
+        rt + "\nSuccessfully promoted {} to sudo!".format(user_member.first_name)
+    )
 
     log_message = (
         f"#SUDO\n"
         f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
-        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
+    )
 
-    if chat.type != 'private':
+    if chat.type != "private":
         log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
     return log_message
@@ -113,12 +123,12 @@ def addsupport(
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
         rt += "Requested bot Admins to promote."
-        data['sudos'].remove(user_id)
+        data["sudos"].remove(user_id)
         SUDO_USERS.remove(user_id)
 
     if user_id in SUPPORT_USERS:
@@ -127,24 +137,26 @@ def addsupport(
 
     if user_id in WHITELIST_USERS:
         rt += "Requested HA to promote this Wolf Disaster to Demon"
-        data['whitelists'].remove(user_id)
+        data["whitelists"].remove(user_id)
         WHITELIST_USERS.remove(user_id)
 
-    data['supports'].append(user_id)
+    data["supports"].append(user_id)
     SUPPORT_USERS.append(user_id)
 
-    with open(ELEVATED_USERS_FILE, 'w') as outfile:
+    with open(ELEVATED_USERS_FILE, "w") as outfile:
         json.dump(data, outfile, indent=4)
 
     update.effective_message.reply_text(
-        rt + f"\n{user_member.first_name} was added as a support user!")
+        rt + f"\n{user_member.first_name} was added as a support user!"
+    )
 
     log_message = (
         f"#SUPPORT\n"
         f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
-        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
+    )
 
-    if chat.type != 'private':
+    if chat.type != "private":
         log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
     return log_message
@@ -167,39 +179,40 @@ def addwhitelist(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
         rt += "This member is a sudo user, Demoting him."
-        data['sudos'].remove(user_id)
+        data["sudos"].remove(user_id)
         SUDO_USERS.remove(user_id)
 
     if user_id in SUPPORT_USERS:
         rt += "This user is already a support user, Demoting him."
-        data['supports'].remove(user_id)
+        data["supports"].remove(user_id)
         SUPPORT_USERS.remove(user_id)
 
     if user_id in WHITELIST_USERS:
         message.reply_text("This user is already a whitelist user.")
         return ""
 
-    data['whitelists'].append(user_id)
+    data["whitelists"].append(user_id)
     WHITELIST_USERS.append(user_id)
 
-    with open(ELEVATED_USERS_FILE, 'w') as outfile:
+    with open(ELEVATED_USERS_FILE, "w") as outfile:
         json.dump(data, outfile, indent=4)
 
     update.effective_message.reply_text(
-        rt +
-        f"\nSuccessfully promoted {user_member.first_name} to a Whitelist User!")
+        rt + f"\nSuccessfully promoted {user_member.first_name} to a Whitelist User!"
+    )
 
     log_message = (
         f"#WHITELIST\n"
         f"<b>Admin:</b> {mention_html(user.id, user.first_name)} \n"
-        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
+    )
 
-    if chat.type != 'private':
+    if chat.type != "private":
         log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
     return log_message
@@ -222,45 +235,45 @@ def addtiger(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
         rt += "This member is a sudo user, Demoting him."
-        data['sudos'].remove(user_id)
+        data["sudos"].remove(user_id)
         SUDO_USERS.remove(user_id)
 
     if user_id in SUPPORT_USERS:
         rt += "This user is already a Support user, Demoting him."
-        data['supports'].remove(user_id)
+        data["supports"].remove(user_id)
         SUPPORT_USERS.remove(user_id)
 
     if user_id in WHITELIST_USERS:
         rt += "This user is already a Whitelist user, Demoting him."
-        data['whitelists'].remove(user_id)
+        data["whitelists"].remove(user_id)
         WHITELIST_USERS.remove(user_id)
 
     if user_id in TIGER_USERS:
         message.reply_text("This user is already a sudo.")
         return ""
 
-    data['tigers'].append(user_id)
+    data["tigers"].append(user_id)
     TIGER_USERS.append(user_id)
 
-    with open(ELEVATED_USERS_FILE, 'w') as outfile:
+    with open(ELEVATED_USERS_FILE, "w") as outfile:
         json.dump(data, outfile, indent=4)
 
     update.effective_message.reply_text(
-        rt +
-        f"\nSuccessfully promoted {user_member.first_name} to a sudo user!"
+        rt + f"\nSuccessfully promoted {user_member.first_name} to a sudo user!"
     )
 
     log_message = (
         f"#TIGER\n"
         f"<b>Admin:</b> {mention_html(user.id, user.first_name)} \n"
-        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
+    )
 
-    if chat.type != 'private':
+    if chat.type != "private":
         log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
     return log_message
@@ -282,15 +295,15 @@ def removesudo(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
         message.reply_text("Requested bot Admins to demote him.")
         SUDO_USERS.remove(user_id)
-        data['sudos'].remove(user_id)
+        data["sudos"].remove(user_id)
 
-        with open(ELEVATED_USERS_FILE, 'w') as outfile:
+        with open(ELEVATED_USERS_FILE, "w") as outfile:
             json.dump(data, outfile, indent=4)
 
         log_message = (
@@ -299,9 +312,8 @@ def removesudo(update: Update, context: CallbackContext) -> str:
             f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
         )
 
-        if chat.type != 'private':
-            log_message = "<b>{}:</b>\n".format(html.escape(
-                chat.title)) + log_message
+        if chat.type != "private":
+            log_message = "<b>{}:</b>\n".format(html.escape(chat.title)) + log_message
 
         return log_message
 
@@ -326,15 +338,15 @@ def removesupport(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in SUPPORT_USERS:
         message.reply_text("Requested bot Admins to demote him")
         SUPPORT_USERS.remove(user_id)
-        data['supports'].remove(user_id)
+        data["supports"].remove(user_id)
 
-        with open(ELEVATED_USERS_FILE, 'w') as outfile:
+        with open(ELEVATED_USERS_FILE, "w") as outfile:
             json.dump(data, outfile, indent=4)
 
         log_message = (
@@ -343,7 +355,7 @@ def removesupport(update: Update, context: CallbackContext) -> str:
             f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
         )
 
-        if chat.type != 'private':
+        if chat.type != "private":
             log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
         return log_message
@@ -369,15 +381,15 @@ def removewhitelist(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in WHITELIST_USERS:
         message.reply_text("Demoting to normal user")
         WHITELIST_USERS.remove(user_id)
-        data['whitelists'].remove(user_id)
+        data["whitelists"].remove(user_id)
 
-        with open(ELEVATED_USERS_FILE, 'w') as outfile:
+        with open(ELEVATED_USERS_FILE, "w") as outfile:
             json.dump(data, outfile, indent=4)
 
         log_message = (
@@ -386,7 +398,7 @@ def removewhitelist(update: Update, context: CallbackContext) -> str:
             f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
         )
 
-        if chat.type != 'private':
+        if chat.type != "private":
             log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
         return log_message
@@ -411,15 +423,15 @@ def removetiger(update: Update, context: CallbackContext) -> str:
         message.reply_text(reply)
         return ""
 
-    with open(ELEVATED_USERS_FILE, 'r') as infile:
+    with open(ELEVATED_USERS_FILE, "r") as infile:
         data = json.load(infile)
 
     if user_id in TIGER_USERS:
         message.reply_text("Demoting to normal user")
         TIGER_USERS.remove(user_id)
-        data['tigers'].remove(user_id)
+        data["tigers"].remove(user_id)
 
-        with open(ELEVATED_USERS_FILE, 'w') as outfile:
+        with open(ELEVATED_USERS_FILE, "w") as outfile:
             json.dump(data, outfile, indent=4)
 
         log_message = (
@@ -428,7 +440,7 @@ def removetiger(update: Update, context: CallbackContext) -> str:
             f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}"
         )
 
-        if chat.type != 'private':
+        if chat.type != "private":
             log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
 
         return log_message
@@ -529,14 +541,11 @@ SUPPORT_HANDLER = CommandHandler(("addsupport", "adddemon"), addsupport)
 TIGER_HANDLER = CommandHandler(("addtiger"), addtiger)
 WHITELIST_HANDLER = CommandHandler(("addwhitelist", "addwolf"), addwhitelist)
 UNSUDO_HANDLER = CommandHandler(("removesudo", "removedragon"), removesudo)
-UNSUPPORT_HANDLER = CommandHandler(("removesupport", "removedemon"),
-                                   removesupport)
+UNSUPPORT_HANDLER = CommandHandler(("removesupport", "removedemon"), removesupport)
 UNTIGER_HANDLER = CommandHandler(("removetiger"), removetiger)
-UNWHITELIST_HANDLER = CommandHandler(("removewhitelist", "removewolf"),
-                                     removewhitelist)
+UNWHITELIST_HANDLER = CommandHandler(("removewhitelist", "removewolf"), removewhitelist)
 
-WHITELISTLIST_HANDLER = CommandHandler(["whitelistlist", "wolves"],
-                                       whitelistlist)
+WHITELISTLIST_HANDLER = CommandHandler(["whitelistlist", "wolves"], whitelistlist)
 TIGERLIST_HANDLER = CommandHandler(["tigers"], tigerlist)
 SUPPORTLIST_HANDLER = CommandHandler(["supportlist", "demons"], supportlist)
 SUDOLIST_HANDLER = CommandHandler(["sudolist", "dragons"], sudolist)
@@ -559,8 +568,17 @@ dispatcher.add_handler(DEVLIST_HANDLER)
 
 __mod_name__ = ""
 __handlers__ = [
-    SUDO_HANDLER, SUPPORT_HANDLER, TIGER_HANDLER, WHITELIST_HANDLER,
-    UNSUDO_HANDLER, UNSUPPORT_HANDLER, UNTIGER_HANDLER, UNWHITELIST_HANDLER,
-    WHITELISTLIST_HANDLER, TIGERLIST_HANDLER, SUPPORTLIST_HANDLER,
-    SUDOLIST_HANDLER, DEVLIST_HANDLER
+    SUDO_HANDLER,
+    SUPPORT_HANDLER,
+    TIGER_HANDLER,
+    WHITELIST_HANDLER,
+    UNSUDO_HANDLER,
+    UNSUPPORT_HANDLER,
+    UNTIGER_HANDLER,
+    UNWHITELIST_HANDLER,
+    WHITELISTLIST_HANDLER,
+    TIGERLIST_HANDLER,
+    SUPPORTLIST_HANDLER,
+    SUDOLIST_HANDLER,
+    DEVLIST_HANDLER,
 ]

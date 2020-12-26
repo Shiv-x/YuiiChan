@@ -3,7 +3,15 @@
 from jikanpy import Jikan
 from jikanpy.exceptions import APIException
 
-from telegram import Message, Chat, User, ParseMode, Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import (
+    Message,
+    Chat,
+    User,
+    ParseMode,
+    Update,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 from telegram.ext import CallbackContext, CommandHandler, Filters, run_async
 
 from YuiiChan import dispatcher
@@ -23,7 +31,7 @@ def anime(update: Update, context: CallbackContext):
         msg.reply_text("Error connecting to the API. Please try again!")
         return ""
     try:
-        res = res.get("results")[0].get("mal_id") # Grab first result
+        res = res.get("results")[0].get("mal_id")  # Grab first result
     except APIException:
         msg.reply_text("Error connecting to the API. Please try again!")
         return ""
@@ -72,17 +80,18 @@ def anime(update: Update, context: CallbackContext):
     rep += f"<i>{synopsis}</i>\n"
     if trailer:
         keyb = [
-            [InlineKeyboardButton("More Information", url=url),
-           InlineKeyboardButton("Trailer", url=trailer)]
+            [
+                InlineKeyboardButton("More Information", url=url),
+                InlineKeyboardButton("Trailer", url=trailer),
+            ]
         ]
     else:
-        keyb = [
-             [InlineKeyboardButton("More Information", url=url)]
-         ]
-    
-    
-    msg.reply_text(rep, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyb))
-    
+        keyb = [[InlineKeyboardButton("More Information", url=url)]]
+
+    msg.reply_text(
+        rep, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyb)
+    )
+
 
 @run_async
 def character(update: Update, context: CallbackContext):
@@ -112,13 +121,13 @@ def character(update: Update, context: CallbackContext):
         rep = f"<b>{name} ({kanji})</b>\n\n"
         rep += f"<a href='{image}'>\u200c</a>"
         rep += f"<i>{about}</i>\n"
-        keyb = [
-            [InlineKeyboardButton("More Information", url=url)]
-        ]
-        
-        msg.reply_text(rep, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyb))
-        
-        
+        keyb = [[InlineKeyboardButton("More Information", url=url)]]
+
+        msg.reply_text(
+            rep, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyb)
+        )
+
+
 @run_async
 def upcoming(update: Update, context: CallbackContext):
     msg = update.effective_message
@@ -132,8 +141,8 @@ def upcoming(update: Update, context: CallbackContext):
         if len(rep) > 2000:
             break
     msg.reply_text(rep, parse_mode=ParseMode.HTML)
-    
-    
+
+
 @run_async
 def manga(update: Update, context: CallbackContext):
     msg = update.effective_message
@@ -176,13 +185,13 @@ def manga(update: Update, context: CallbackContext):
         rep += f"<b>Chapters:</b> <code>{chapters}</code>\n\n"
         rep += f"<a href='{image}'>\u200c</a>"
         rep += f"<i>{synopsis}</i>"
-        keyb = [
-            [InlineKeyboardButton("More Information", url=url)]
-        ]
-        
-        msg.reply_text(rep, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyb))
-        
-        
+        keyb = [[InlineKeyboardButton("More Information", url=url)]]
+
+        msg.reply_text(
+            rep, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyb)
+        )
+
+
 __help__ = """
 Get information about anime, manga or characters with the help of this module! All data is fetched from [MyAnimeList](https://myanimelist.net).
 
@@ -194,8 +203,8 @@ Get information about anime, manga or characters with the help of this module! A
  """
 
 __mod_name__ = "MyAnimeList"
-        
-        
+
+
 ANIME_HANDLER = CommandHandler("yanime", anime, pass_args=True)
 CHARACTER_HANDLER = CommandHandler("ycharacter", character, pass_args=True)
 UPCOMING_HANDLER = CommandHandler("yupcoming", upcoming)

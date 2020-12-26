@@ -1,4 +1,5 @@
 import html
+
 # AI module using Intellivoid's Coffeehouse API by @TheRealPhoenix
 from time import sleep, time
 
@@ -12,8 +13,13 @@ from YuiiChan.modules.helper_funcs.filters import CustomFilters
 from YuiiChan.modules.log_channel import gloggable
 from telegram import Update
 from telegram.error import BadRequest, RetryAfter, Unauthorized
-from telegram.ext import (CallbackContext, CommandHandler, Filters,
-                          MessageHandler, run_async)
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    Filters,
+    MessageHandler,
+    run_async,
+)
 from telegram.utils.helpers import mention_html
 
 CoffeeHouseAPI = API(AI_API_KEY)
@@ -35,9 +41,11 @@ def add_chat(update: Update, context: CallbackContext):
         expires = str(ses.expires)
         sql.set_ses(chat.id, ses_id, expires)
         chat.send_message("AI successfully enabled for this chat!")
-        message = (f"<b>{html.escape(chat.title)}:</b>\n"
-                   f"#AI_ENABLED\n"
-                   f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n")
+        message = (
+            f"<b>{html.escape(chat.title)}:</b>\n"
+            f"#AI_ENABLED\n"
+            f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
+        )
         return message
     else:
         msg.reply_text("AI is already enabled for this chat!")
@@ -58,9 +66,11 @@ def remove_chat(update: Update, context: CallbackContext):
     else:
         sql.rem_chat(chat.id)
         chat.send_message("AI disabled successfully!")
-        message = (f"<b>{html.escape(chat.title)}:</b>\n"
-                   f"#AI_DISABLED\n"
-                   f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n")
+        message = (
+            f"<b>{html.escape(chat.title)}:</b>\n"
+            f"#AI_DISABLED\n"
+            f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
+        )
         return message
 
 
@@ -100,13 +110,12 @@ def chatbot(update: Update, context: CallbackContext):
         except ValueError:
             pass
         try:
-            bot.send_chat_action(chat_id, action='typing')
+            bot.send_chat_action(chat_id, action="typing")
             rep = api_client.think_thought(sesh, query)
             sleep(0.3)
             msg.reply_text(rep, timeout=60)
         except CFError as e:
-            bot.send_message(OWNER_ID,
-                             f"Chatbot error: {e} occurred in {chat_id}!")
+            bot.send_message(OWNER_ID, f"Chatbot error: {e} occurred in {chat_id}!")
 
 
 @run_async
@@ -147,10 +156,13 @@ Reports bugs at {SUPPORT_CHAT}
 ADD_CHAT_HANDLER = CommandHandler("addchat", add_chat)
 REMOVE_CHAT_HANDLER = CommandHandler("rmchat", remove_chat)
 CHATBOT_HANDLER = MessageHandler(
-    Filters.text & (~Filters.regex(r"^#[^\s]+") & ~Filters.regex(r"^!")
-                    & ~Filters.regex(r"^\/")), chatbot)
+    Filters.text
+    & (~Filters.regex(r"^#[^\s]+") & ~Filters.regex(r"^!") & ~Filters.regex(r"^\/")),
+    chatbot,
+)
 LIST_CB_CHATS_HANDLER = CommandHandler(
-    "listaichats", list_chatbot_chats, filters=CustomFilters.dev_filter)
+    "listaichats", list_chatbot_chats, filters=CustomFilters.dev_filter
+)
 # Filters for ignoring #note messages, !commands and sed.
 
 dispatcher.add_handler(ADD_CHAT_HANDLER)

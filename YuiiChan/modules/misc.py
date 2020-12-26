@@ -2,8 +2,15 @@ import html
 import re
 
 import requests
-from YuiiChan import (DEV_USERS, OWNER_ID, SUDO_USERS, SUPPORT_USERS,
-                          TIGER_USERS, WHITELIST_USERS, dispatcher)
+from YuiiChan import (
+    DEV_USERS,
+    OWNER_ID,
+    SUDO_USERS,
+    SUPPORT_USERS,
+    TIGER_USERS,
+    WHITELIST_USERS,
+    dispatcher,
+)
 from YuiiChan.__main__ import STATS, TOKEN, USER_INFO
 from YuiiChan.modules.disable import DisableAbleCommandHandler
 from YuiiChan.modules.helper_funcs.chat_status import sudo_plus, user_admin
@@ -58,26 +65,28 @@ def get_id(update: Update, context: CallbackContext):
                 f" has an ID of <code>{user2.id}</code>.\n"
                 f"The forwarder, {html.escape(user1.first_name)},"
                 f" has an ID of <code>{user1.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                parse_mode=ParseMode.HTML,
+            )
 
         else:
 
             user = bot.get_chat(user_id)
             msg.reply_text(
                 f"{html.escape(user.first_name)}'s id is <code>{user.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                parse_mode=ParseMode.HTML,
+            )
 
     else:
 
         if chat.type == "private":
             msg.reply_text(
-                f"Your id is <code>{chat.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                f"Your id is <code>{chat.id}</code>.", parse_mode=ParseMode.HTML
+            )
 
         else:
             msg.reply_text(
-                f"This group's id is <code>{chat.id}</code>.",
-                parse_mode=ParseMode.HTML)
+                f"This group's id is <code>{chat.id}</code>.", parse_mode=ParseMode.HTML
+            )
 
 
 @run_async
@@ -86,12 +95,10 @@ def gifid(update: Update, context: CallbackContext):
     if msg.reply_to_message and msg.reply_to_message.animation:
         update.effective_message.reply_text(
             f"Gif ID:\n<code>{msg.reply_to_message.animation.file_id}</code>",
-            parse_mode=ParseMode.HTML)
+            parse_mode=ParseMode.HTML,
+        )
     else:
-        update.effective_message.reply_text(
-            "Please reply to a gif to get its ID.")
-
-
+        update.effective_message.reply_text("Please reply to a gif to get its ID.")
 
 
 @run_async
@@ -110,21 +117,22 @@ def echo(update: Update, context: CallbackContext):
 
 @run_async
 def markdown_help(update: Update, context: CallbackContext):
+    update.effective_message.reply_text(MARKDOWN_HELP, parse_mode=ParseMode.HTML)
     update.effective_message.reply_text(
-        MARKDOWN_HELP, parse_mode=ParseMode.HTML)
-    update.effective_message.reply_text(
-        "Try forwarding the following message to me, and you'll see!")
+        "Try forwarding the following message to me, and you'll see!"
+    )
     update.effective_message.reply_text(
         "/save test This is a markdown test. _italics_, *bold*, `code`, "
         "[URL](example.com) [button](buttonurl:github.com) "
-        "[button2](buttonurl://google.com:same)")
+        "[button2](buttonurl://google.com:same)"
+    )
 
 
 @run_async
 @sudo_plus
 def stats(update: Update, context: CallbackContext):
     stats = "Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS])
-    result = re.sub(r'(\d+)', r'<code>\1</code>', stats)
+    result = re.sub(r"(\d+)", r"<code>\1</code>", stats)
     update.effective_message.reply_text(result, parse_mode=ParseMode.HTML)
 
 
@@ -137,22 +145,18 @@ __help__ = """
 
 ID_HANDLER = DisableAbleCommandHandler("id", get_id)
 GIFID_HANDLER = DisableAbleCommandHandler("gifid", gifid)
-#INFO_HANDLER = DisableAbleCommandHandler(["info", "appraise", "appraisal"],
+# INFO_HANDLER = DisableAbleCommandHandler(["info", "appraise", "appraisal"],
 ECHO_HANDLER = DisableAbleCommandHandler("echo", echo, filters=Filters.group)
-MD_HELP_HANDLER = CommandHandler(
-    "markdownhelp", markdown_help, filters=Filters.private)
+MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
 STATS_HANDLER = CommandHandler("stats", stats)
 
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(GIFID_HANDLER)
-#dispatcher.add_handler(INFO_HANDLER)
+# dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
 
 __mod_name__ = "Misc"
 __command_list__ = ["id", "echo"]
-__handlers__ = [
-    ID_HANDLER, GIFID_HANDLER, ECHO_HANDLER, MD_HELP_HANDLER,
-    STATS_HANDLER
-]
+__handlers__ = [ID_HANDLER, GIFID_HANDLER, ECHO_HANDLER, MD_HELP_HANDLER, STATS_HANDLER]

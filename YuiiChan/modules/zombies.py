@@ -8,19 +8,32 @@ from telethon import events, Button
 from asyncio import sleep
 from os import remove
 from YuiiChan.modules.helper_funcs.telethn.chatstatus import (
-    can_delete_messages, user_is_admin, haruka_is_admin, can_ban_users)
+    can_delete_messages,
+    user_is_admin,
+    haruka_is_admin,
+    can_ban_users,
+)
 
-from telethon.errors import (BadRequestError, ChatAdminRequiredError,
-                             ImageProcessFailedError, PhotoCropSizeSmallError,
-                             UserAdminInvalidError)
-from telethon.errors.rpcerrorlist import (UserIdInvalidError,
-                                          MessageTooLongError)
-from telethon.tl.functions.channels import (EditAdminRequest,
-                                            EditBannedRequest,
-                                            EditPhotoRequest)
-from telethon.tl.types import (ChannelParticipantsAdmins, ChatAdminRights,
-                               ChatBannedRights, MessageEntityMentionName,
-                               MessageMediaPhoto)
+from telethon.errors import (
+    BadRequestError,
+    ChatAdminRequiredError,
+    ImageProcessFailedError,
+    PhotoCropSizeSmallError,
+    UserAdminInvalidError,
+)
+from telethon.errors.rpcerrorlist import UserIdInvalidError, MessageTooLongError
+from telethon.tl.functions.channels import (
+    EditAdminRequest,
+    EditBannedRequest,
+    EditPhotoRequest,
+)
+from telethon.tl.types import (
+    ChannelParticipantsAdmins,
+    ChatAdminRights,
+    ChatBannedRights,
+    MessageEntityMentionName,
+    MessageMediaPhoto,
+)
 
 
 # =================== CONSTANT ===================
@@ -65,7 +78,7 @@ async def is_administrator(user_id: int, message):
     return admin
 
 
-@telethn.on(events.CallbackQuery(data=b'rmdel'))
+@telethn.on(events.CallbackQuery(data=b"rmdel"))
 async def _(event):
     x = await event.client.get_entity(event.chat_id)
     title = x.title
@@ -76,13 +89,18 @@ async def _(event):
         if user.deleted:
             try:
                 await event.client(
-                    EditBannedRequest(event.chat_id, user.id, BANNED_RIGHTS))
+                    EditBannedRequest(event.chat_id, user.id, BANNED_RIGHTS)
+                )
                 all_deleted = True
             except Exception as e:
                 print(e)
 
     if all_deleted is True:
-        await event.client.edit_message(event.chat_id, event.query.msg_id, f"Removed all deleted accounts in **{title}**.")
+        await event.client.edit_message(
+            event.chat_id,
+            event.query.msg_id,
+            f"Removed all deleted accounts in **{title}**.",
+        )
 
 
 @saitama(pattern="^/zombies$")
@@ -112,6 +130,11 @@ async def rm_deletedacc(show):
         await show.client.delete_messages(show.chat_id, x.id)
         del_status = f"Found **{del_u}** deleted/zombies account(s) in this group,\
             \nclean them by clicking the button below."
-        await show.client.send_message(show.chat_id, del_status, buttons=[Button.inline('Clean Zombies', b'rmdel')], reply_to=show.id)
+        await show.client.send_message(
+            show.chat_id,
+            del_status,
+            buttons=[Button.inline("Clean Zombies", b"rmdel")],
+            reply_to=show.id,
+        )
     else:
         await show.client.edit_message(show.chat_id, x.id, del_status)

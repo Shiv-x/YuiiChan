@@ -14,10 +14,11 @@ from telegram.ext import run_async
 from YuiiChan import dispatcher
 from YuiiChan.modules.disable import DisableAbleCommandHandler
 import YuiiChan.modules.fun_strings as fun_strings
-from YuiiChan.modules.helper_funcs.chat_status import (is_user_admin)
+from YuiiChan.modules.helper_funcs.chat_status import is_user_admin
 from YuiiChan.modules.helper_funcs.extraction import extract_user
 from telegram import ParseMode, Update
 from telegram.ext import CallbackContext, run_async
+
 
 @run_async
 def runs(update: Update, context: CallbackContext):
@@ -30,7 +31,11 @@ def slap(update: Update, context: CallbackContext):
     message = update.effective_message
     chat = update.effective_chat
 
-    reply_text = message.reply_to_message.reply_text if message.reply_to_message else message.reply_text
+    reply_text = (
+        message.reply_to_message.reply_text
+        if message.reply_to_message
+        else message.reply_text
+    )
 
     curr_user = html.escape(message.from_user.first_name)
     user_id = extract_user(message, args)
@@ -49,7 +54,8 @@ def slap(update: Update, context: CallbackContext):
                     chat.id,
                     message.from_user.id,
                     until_date=mutetime,
-                    permissions=ChatPermissions(can_send_messages=False))
+                    permissions=ChatPermissions(can_send_messages=False),
+                )
             reply_text(temp[0])
         else:
             reply_text(temp)
@@ -70,8 +76,7 @@ def slap(update: Update, context: CallbackContext):
     hit = random.choice(fun_strings.HIT)
     throw = random.choice(fun_strings.THROW)
 
-    reply = temp.format(
-        user1=user1, user2=user2, item=item, hits=hit, throws=throw)
+    reply = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
 
     reply_text(reply, parse_mode=ParseMode.HTML)
 
@@ -80,6 +85,7 @@ def slap(update: Update, context: CallbackContext):
 def roll(update: Update, context: CallbackContext):
     update.message.reply_text(random.choice(range(1, 7)))
 
+
 @run_async
 def rlg(update: Update, context: CallbackContext):
     eyes = random.choice(fun_strings.EYES)
@@ -87,14 +93,19 @@ def rlg(update: Update, context: CallbackContext):
     ears = random.choice(fun_strings.EARS)
 
     if len(eyes) == 2:
-       repl = ears[0] + eyes[0] + mouth[0] + eyes[1] + ears[1]
+        repl = ears[0] + eyes[0] + mouth[0] + eyes[1] + ears[1]
     else:
-       repl = ears[0] + eyes[0] + mouth[0] + eyes[0] + ears[1]
+        repl = ears[0] + eyes[0] + mouth[0] + eyes[0] + ears[1]
     update.message.reply_text(repl)
+
 
 @run_async
 def table(update: Update, context: CallbackContext):
-    reply_text = update.effective_message.reply_to_message.reply_text if update.effective_message.reply_to_message else update.effective_message.reply_text
+    reply_text = (
+        update.effective_message.reply_to_message.reply_text
+        if update.effective_message.reply_to_message
+        else update.effective_message.reply_text
+    )
     reply_text(random.choice(fun_strings.TABLE))
 
 
@@ -125,24 +136,21 @@ SHRUGS = (
 )
 
 HUGS = (
-"⊂(・﹏・⊂)",
-"⊂(・ヮ・⊂)",
-"⊂(・▽・⊂)",
-"(っಠ‿ಠ)っ",
-"ʕっ•ᴥ•ʔっ",
-"（っ・∀・）っ",
-"(っ⇀⑃↼)っ",
-"(つ´∀｀)つ",
-"(.づσ▿σ)づ.",
-"⊂(´・ω・｀⊂)",
-"(づ￣ ³￣)づ",
-"(.づ◡﹏◡)づ.",
+    "⊂(・﹏・⊂)",
+    "⊂(・ヮ・⊂)",
+    "⊂(・▽・⊂)",
+    "(っಠ‿ಠ)っ",
+    "ʕっ•ᴥ•ʔっ",
+    "（っ・∀・）っ",
+    "(っ⇀⑃↼)っ",
+    "(つ´∀｀)つ",
+    "(.づσ▿σ)づ.",
+    "⊂(´・ω・｀⊂)",
+    "(づ￣ ³￣)づ",
+    "(.づ◡﹏◡)づ.",
 )
 
-TOSS = (
-"The coin landed on heads.",
-"The coin landed on tails."
-)
+TOSS = ("The coin landed on heads.", "The coin landed on tails.")
 
 REACTS = (
     "ʘ‿ʘ",
@@ -245,40 +253,112 @@ REACTS = (
     "(｡◕‿◕｡)",
 )
 
-normiefont = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-weebyfont = ['卂','乃','匚','刀','乇','下','厶','卄','工','丁','长','乚','从','𠘨','口','尸','㔿','尺','丂','丅','凵','リ','山','乂','丫','乙']
+normiefont = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+]
+weebyfont = [
+    "卂",
+    "乃",
+    "匚",
+    "刀",
+    "乇",
+    "下",
+    "厶",
+    "卄",
+    "工",
+    "丁",
+    "长",
+    "乚",
+    "从",
+    "𠘨",
+    "口",
+    "尸",
+    "㔿",
+    "尺",
+    "丂",
+    "丅",
+    "凵",
+    "リ",
+    "山",
+    "乂",
+    "丫",
+    "乙",
+]
 
 
 @run_async
 def shrug(update: Update, context: CallbackContext):
     # reply to correct message
-    reply_text = update.effective_message.reply_to_message.reply_text if update.effective_message.reply_to_message else update.effective_message.reply_text
+    reply_text = (
+        update.effective_message.reply_to_message.reply_text
+        if update.effective_message.reply_to_message
+        else update.effective_message.reply_text
+    )
     reply_text = reply_text(random.choice(SHRUGS))
 
+
 run_async
+
+
 def bluetext(update: Update, context: CallbackContext):
     msg = update.effective_message
-    reply_text = msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
+    reply_text = (
+        msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
+    )
     reply_text(
         "/BLUE /TEXT\n/MUST /CLICK\n/I /AM /A /STUPID /ANIMAL /THAT /IS /ATTRACTED /TO /COLORS"
     )
 
+
 @run_async
 def hug(update: Update, context: CallbackContext):
     # reply to correct message
-    reply_text = update.effective_message.reply_to_message.reply_text if update.effective_message.reply_to_message else update.effective_message.reply_text
+    reply_text = (
+        update.effective_message.reply_to_message.reply_text
+        if update.effective_message.reply_to_message
+        else update.effective_message.reply_text
+    )
     reply_text = reply_text(random.choice(HUGS))
 
 
 @run_async
 def toss(update: Update, context: CallbackContext):
- 	update.effective_message.reply_text(random.choice(TOSS))
+    update.effective_message.reply_text(random.choice(TOSS))
 
 
 @run_async
 def react(update: Update, context: CallbackContext):
-	 # reply to correct message
-    reply_text = update.effective_message.reply_to_message.reply_text if update.effective_message.reply_to_message else update.effective_message.reply_text
+    # reply to correct message
+    reply_text = (
+        update.effective_message.reply_to_message.reply_text
+        if update.effective_message.reply_to_message
+        else update.effective_message.reply_text
+    )
     reply_text = reply_text(random.choice(REACTS))
 
 
@@ -287,9 +367,9 @@ def shout(update: Update, context: CallbackContext):
     msg = "```"
     text = context.args
     result = []
-    result.append(' '.join([s for s in text]))
+    result.append(" ".join([s for s in text]))
     for pos, symbol in enumerate(text[1:]):
-        result.append(symbol + ' ' + '  ' * pos + symbol)
+        result.append(symbol + " " + "  " * pos + symbol)
     result = list("\n".join(result))
     result[0] = text[0]
     result = "".join(result)
@@ -306,22 +386,46 @@ def pat(update: Update, context: CallbackContext):
         msg = msg.split(" ", 1)[1]
     except IndexError:
         msg = ""
-    msg_id = update.effective_message.reply_to_message.message_id if update.effective_message.reply_to_message else update.effective_message.message_id
+    msg_id = (
+        update.effective_message.reply_to_message.message_id
+        if update.effective_message.reply_to_message
+        else update.effective_message.message_id
+    )
     pats = []
-    pats = json.loads(urllib.request.urlopen(urllib.request.Request(
-    'http://headp.at/js/pats.json',
-    headers={'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686) '
-         'Gecko/20071127 Firefox/2.0.0.11'}
-    )).read().decode('utf-8'))
+    pats = json.loads(
+        urllib.request.urlopen(
+            urllib.request.Request(
+                "http://headp.at/js/pats.json",
+                headers={
+                    "User-Agent": "Mozilla/5.0 (X11; U; Linux i686) "
+                    "Gecko/20071127 Firefox/2.0.0.11"
+                },
+            )
+        )
+        .read()
+        .decode("utf-8")
+    )
     if "@" in msg and len(msg) > 5:
-        context.bot.send_photo(chat_id, f'https://headp.at/pats/{urllib.parse.quote(random.choice(pats))}', caption=msg)
+        context.bot.send_photo(
+            chat_id,
+            f"https://headp.at/pats/{urllib.parse.quote(random.choice(pats))}",
+            caption=msg,
+        )
     else:
-        context.bot.send_photo(chat_id, f'https://headp.at/pats/{urllib.parse.quote(random.choice(pats))}', reply_to_message_id=msg_id)
+        context.bot.send_photo(
+            chat_id,
+            f"https://headp.at/pats/{urllib.parse.quote(random.choice(pats))}",
+            reply_to_message_id=msg_id,
+        )
 
 
 @run_async
 def wiki(update: Update, context: CallbackContext):
-    msg = update.effective_message.reply_to_message if update.effective_message.reply_to_message else update.effective_message
+    msg = (
+        update.effective_message.reply_to_message
+        if update.effective_message.reply_to_message
+        else update.effective_message
+    )
     res = ""
     if msg == update.effective_message:
         search = msg.text.split(" ", maxsplit=1)[1]
@@ -330,21 +434,31 @@ def wiki(update: Update, context: CallbackContext):
     try:
         res = wikipedia.summary(search)
     except DisambiguationError as e:
-        update.message.reply_text("Disambiguated pages found! Adjust your query accordingly.\n<i>{}</i>".format(e),
-        parse_mode=ParseMode.HTML)
+        update.message.reply_text(
+            "Disambiguated pages found! Adjust your query accordingly.\n<i>{}</i>".format(
+                e
+            ),
+            parse_mode=ParseMode.HTML,
+        )
     except PageError as e:
-        update.message.reply_text("<code>{}</code>".format(e), parse_mode=ParseMode.HTML)
+        update.message.reply_text(
+            "<code>{}</code>".format(e), parse_mode=ParseMode.HTML
+        )
     if res:
         result = f"<b>{search}</b>\n\n"
         result += f"<i>{res}</i>\n"
         result += f"""<a href="https://en.wikipedia.org/wiki/{search.replace(" ", "%20")}">Read more...</a>"""
         if len(result) > 4000:
-            with open("result.txt", 'w') as f:
+            with open("result.txt", "w") as f:
                 f.write(f"{result}\n\nUwU OwO OmO UmU")
-            with open("result.txt", 'rb') as f:
-                context.bot.send_document(document=f, filename=f.name,
-                    reply_to_message_id=update.message.message_id, chat_id=update.effective_chat.id,
-                    parse_mode=ParseMode.HTML)
+            with open("result.txt", "rb") as f:
+                context.bot.send_document(
+                    document=f,
+                    filename=f.name,
+                    reply_to_message_id=update.message.message_id,
+                    chat_id=update.effective_chat.id,
+                    parse_mode=ParseMode.HTML,
+                )
         else:
             update.message.reply_text(result, parse_mode=ParseMode.HTML)
 
@@ -386,7 +500,6 @@ def weebify(update: Update, context: CallbackContext):
         msg.reply_text(string)
 
 
-
 __help__ = """
 -  /runs: reply a random string from an array of replies.
 -  /slap: slap a user, or get slapped if not a reply.
@@ -411,7 +524,7 @@ RLG_HANDLER = DisableAbleCommandHandler("rlg", rlg)
 HUG_HANDLER = DisableAbleCommandHandler("hug", hug)
 REACT_HANDLER = DisableAbleCommandHandler("react", react)
 TOSS_HANDLER = DisableAbleCommandHandler("toss", toss)
-#SHOUT_HANDLER = DisableAbleCommandHandler("shout", shout, pass_args=True)
+# SHOUT_HANDLER = DisableAbleCommandHandler("shout", shout, pass_args=True)
 PAT_HANDLER = DisableAbleCommandHandler("pat", pat)
 WIKI_HANDLER = DisableAbleCommandHandler("wiki", wiki)
 JUDGE_HANDLER = DisableAbleCommandHandler(["judge", "decide"], judge)
@@ -422,7 +535,7 @@ ROLL_HANDLER = DisableAbleCommandHandler("roll", roll)
 dispatcher.add_handler(SHRUG_HANDLER)
 dispatcher.add_handler(HUG_HANDLER)
 dispatcher.add_handler(REACT_HANDLER)
-#dispatcher.add_handler(SHOUT_HANDLER)
+# dispatcher.add_handler(SHOUT_HANDLER)
 dispatcher.add_handler(TOSS_HANDLER)
 dispatcher.add_handler(PAT_HANDLER)
 dispatcher.add_handler(WIKI_HANDLER)
@@ -438,11 +551,34 @@ dispatcher.add_handler(ROLL_HANDLER)
 __mod_name__ = "Extras"
 
 __command_list__ = [
-    "runs", "slap", "shrug", "hug","pat","react","toss", "shg", "bluetext", "rlg", "judge",
-    "table","shout","wiki"
+    "runs",
+    "slap",
+    "shrug",
+    "hug",
+    "pat",
+    "react",
+    "toss",
+    "shg",
+    "bluetext",
+    "rlg",
+    "judge",
+    "table",
+    "shout",
+    "wiki",
 ]
 __handlers__ = [
-    RUNS_HANDLER, SLAP_HANDLER, ROLL_HANDLER, TOSS_HANDLER, SHRUG_HANDLER,
-    BLUETEXT_HANDLER, RLG_HANDLER, TABLE_HANDLER, WEEBIFY_HANDLER,
-    JUDGE_HANDLER, WIKI_HANDLER, PAT_HANDLER, HUG_HANDLER, REACT_HANDLER
+    RUNS_HANDLER,
+    SLAP_HANDLER,
+    ROLL_HANDLER,
+    TOSS_HANDLER,
+    SHRUG_HANDLER,
+    BLUETEXT_HANDLER,
+    RLG_HANDLER,
+    TABLE_HANDLER,
+    WEEBIFY_HANDLER,
+    JUDGE_HANDLER,
+    WIKI_HANDLER,
+    PAT_HANDLER,
+    HUG_HANDLER,
+    REACT_HANDLER,
 ]

@@ -7,8 +7,13 @@ from YuiiChan.modules.helper_funcs.chat_status import dev_plus, sudo_plus
 from YuiiChan.modules.sql.users_sql import get_all_users
 from telegram import TelegramError, Update
 from telegram.error import BadRequest
-from telegram.ext import (CallbackContext, CommandHandler, Filters,
-                          MessageHandler, run_async)
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    Filters,
+    MessageHandler,
+    run_async,
+)
 
 USERS_GROUP = 4
 CHAT_GROUP = 5
@@ -20,7 +25,7 @@ def get_user_id(username):
     if len(username) <= 5:
         return None
 
-    if username.startswith('@'):
+    if username.startswith("@"):
         username = username[1:]
 
     users = sql.get_userid_by_name(username)
@@ -39,7 +44,7 @@ def get_user_id(username):
                     return userdat.id
 
             except BadRequest as excp:
-                if excp.message == 'Chat not found':
+                if excp.message == "Chat not found":
                     pass
                 else:
                     LOGGER.exception("Error extracting user ID")
@@ -54,9 +59,9 @@ def broadcast(update: Update, context: CallbackContext):
 
     if len(to_send) >= 2:
         to_group = to_user = False
-        if to_send[0] == '/broadcastgroups':
+        if to_send[0] == "/broadcastgroups":
             to_group = True
-        if to_send[0] == '/broadcastusers':
+        if to_send[0] == "/broadcastusers":
             to_user = True
         else:
             to_group = to_user = True
@@ -71,7 +76,8 @@ def broadcast(update: Update, context: CallbackContext):
                         int(chat.chat_id),
                         to_send[1],
                         parse_mode="MARKDOWN",
-                        disable_web_page_preview=True)
+                        disable_web_page_preview=True,
+                    )
                     sleep(0.1)
                 except TelegramError:
                     failed += 1
@@ -82,7 +88,8 @@ def broadcast(update: Update, context: CallbackContext):
                         int(user.user_id),
                         to_send[1],
                         parse_mode="MARKDOWN",
-                        disable_web_page_preview=True)
+                        disable_web_page_preview=True,
+                    )
                     sleep(0.1)
                 except TelegramError:
                     failed_user += 1
@@ -96,13 +103,15 @@ def log_user(update: Update, context: CallbackContext):
     chat = update.effective_chat
     msg = update.effective_message
 
-    sql.update_user(msg.from_user.id, msg.from_user.username, chat.id,
-                    chat.title)
+    sql.update_user(msg.from_user.id, msg.from_user.username, chat.id, chat.title)
 
     if msg.reply_to_message:
-        sql.update_user(msg.reply_to_message.from_user.id,
-                        msg.reply_to_message.from_user.username, chat.id,
-                        chat.title)
+        sql.update_user(
+            msg.reply_to_message.from_user.id,
+            msg.reply_to_message.from_user.username,
+            chat.id,
+            chat.title,
+        )
 
     if msg.forward_from:
         sql.update_user(msg.forward_from.id, msg.forward_from.username)
@@ -112,7 +121,7 @@ def log_user(update: Update, context: CallbackContext):
 @sudo_plus
 def chats(update: Update, context: CallbackContext):
     all_chats = sql.get_all_chats() or []
-    chatfile = 'List of chats.\n0. Chat name | Chat ID | Members count\n'
+    chatfile = "List of chats.\n0. Chat name | Chat ID | Members count\n"
     P = 1
     for chat in all_chats:
         try:
@@ -123,7 +132,9 @@ def chats(update: Update, context: CallbackContext):
                 invitelink = context.bot.exportChatInviteLink(chat.chat_id)
             else:
                 invitelink = "0"
-            chatfile += "{}. {} | {} | {} | {}\n".format(P, chat.chat_name, chat.chat_id, chat_members, invitelink)
+            chatfile += "{}. {} | {} | {} | {}\n".format(
+                P, chat.chat_name, chat.chat_id, chat_members, invitelink
+            )
             P = P + 1
         except:
             pass
@@ -133,14 +144,14 @@ def chats(update: Update, context: CallbackContext):
         update.effective_message.reply_document(
             document=output,
             filename="chatlist.txt",
-            caption="Here is the list of chats in my database.")
+            caption="Here is the list of chats in my database.",
+        )
 
 
 @run_async
 def chat_checker(update: Update, context: CallbackContext):
     bot = context.bot
-    if update.effective_message.chat.get_member(
-            bot.id).can_send_messages is False:
+    if update.effective_message.chat.get_member(bot.id).can_send_messages is False:
         bot.leaveChat(update.effective_message.chat.id)
 
 
@@ -162,7 +173,8 @@ def __migrate__(old_chat_id, new_chat_id):
 __help__ = ""  # no help string
 
 BROADCAST_HANDLER = CommandHandler(
-    ["broadcastall", "broadcastusers", "broadcastgroups"], broadcast)
+    ["broadcastall", "broadcastusers", "broadcastgroups"], broadcast
+)
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
 CHAT_CHECKER_HANDLER = MessageHandler(Filters.all & Filters.group, chat_checker)
 CHATLIST_HANDLER = CommandHandler("chatlist", chats)
@@ -173,5 +185,4 @@ dispatcher.add_handler(CHATLIST_HANDLER)
 dispatcher.add_handler(CHAT_CHECKER_HANDLER, CHAT_GROUP)
 
 __mod_name__ = "Users"
-__handlers__ = [(USER_HANDLER, USERS_GROUP), BROADCAST_HANDLER,
-                CHATLIST_HANDLER]
+__handlers__ = [(USER_HANDLER, USERS_GROUP), BROADCAST_HANDLER, CHATLIST_HANDLER]
