@@ -222,12 +222,14 @@ def start(update: Update, context: CallbackContext):
                                 ),
                             )
                         ],
-                        InlineKeyboardButton(
-                            text="Support Group", url=f"t.me/{SUPPORT_CHAT}"
-                        ),
-                        InlineKeyboardButton(
-                            text="Source Code", url="github.com/rshero/YuiiChan"
-                        ),
+                        [
+                            InlineKeyboardButton(
+                                text="Support Group", url=f"t.me/{SUPPORT_CHAT}"
+                            ),
+                            InlineKeyboardButton(
+                                text="Source Code", url="github.com/rshero/YuiiChan"
+                            ),
+                        ],
                     ]
                 ),
             )
