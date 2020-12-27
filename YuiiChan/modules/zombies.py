@@ -13,27 +13,8 @@ from YuiiChan.modules.helper_funcs.telethn.chatstatus import (
     can_ban_users,
 )
 
-from telethon.errors import (
-    BadRequestError,
-    ChatAdminRequiredError,
-    ImageProcessFailedError,
-    PhotoCropSizeSmallError,
-    UserAdminInvalidError,
-)
-from telethon.errors.rpcerrorlist import UserIdInvalidError, MessageTooLongError
-from telethon.tl.functions.channels import (
-    EditAdminRequest,
-    EditBannedRequest,
-    EditPhotoRequest,
-)
-from telethon.tl.types import (
-    ChannelParticipantsAdmins,
-    ChatAdminRights,
-    ChatBannedRights,
-    MessageEntityMentionName,
-    MessageMediaPhoto,
-)
 
+from telethon.tl.types import ChatBannedRights
 
 # =================== CONSTANT ===================
 
@@ -60,9 +41,6 @@ UNBAN_RIGHTS = ChatBannedRights(
     embed_links=None,
 )
 
-MUTE_RIGHTS = ChatBannedRights(until_date=None, send_messages=True)
-
-UNMUTE_RIGHTS = ChatBannedRights(until_date=None, send_messages=False)
 # ================================================
 
 
