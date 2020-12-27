@@ -10,7 +10,6 @@ from os import remove
 from YuiiChan.modules.helper_funcs.telethn.chatstatus import (
     can_delete_messages,
     user_is_admin,
-    haruka_is_admin,
     can_ban_users,
 )
 
@@ -103,7 +102,7 @@ async def _(event):
         )
 
 
-@saitama(pattern="^/zombies$")
+@yuii(pattern="^/zombies$")
 async def rm_deletedacc(show):
     if not show.is_group:
         await event.reply("`I don't think this is a group.`")
