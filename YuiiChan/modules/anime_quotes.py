@@ -21,8 +21,8 @@ from telegram.ext import (
 
 def anime_quote():
     url = "https://animechanapi.xyz/api/quotes/random"
-    # since text attribute returns dictionary like string
     response = requests.get(url)
+    # since text attribute returns dictionary like string
     dic = json.loads(response.text)
     quote = dic["data"][0]["quote"]
     character = dic["data"][0]["character"]
