@@ -26,7 +26,7 @@ def afk(update: Update, context: CallbackContext):
     else:
         reason = ""
 
-    sql.set_afk(update.effective_user.id, afk_time, reason)
+    sql.set_afk(update.effective_user.id, afk_time=afk_time, reason)
     fname = update.effective_user.first_name
     update.effective_message.reply_text("{} is now away!{}".format(fname, notice))
 
