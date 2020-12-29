@@ -1,4 +1,5 @@
 import random
+import time
 
 from YuiiChan import dispatcher
 from YuiiChan.modules.disable import DisableAbleCommandHandler
@@ -15,6 +16,7 @@ AFK_REPLY_GROUP = 8
 @run_async
 def afk(update: Update, context: CallbackContext):
     args = update.effective_message.text.split(None, 1)
+    afk_time = int(time.time())
     notice = ""
     if len(args) >= 2:
         reason = args[1]
@@ -24,7 +26,7 @@ def afk(update: Update, context: CallbackContext):
     else:
         reason = ""
 
-    sql.set_afk(update.effective_user.id, reason)
+    sql.set_afk(update.effective_user.id, reason, afk_time)
     fname = update.effective_user.first_name
     update.effective_message.reply_text("{} is now away!{}".format(fname, notice))
 
@@ -119,17 +121,46 @@ def reply_afk(update: Update, context: CallbackContext):
 def check_afk(update, context, user_id, fst_name, userc_id):
     if sql.is_afk(user_id):
         user = sql.check_afk_status(user_id)
+        afk_time = sql.get_afk_time(user_id)
+        afk_since = get_readable_time((time.time() - afk_time))
         if not user.reason:
             if int(userc_id) == int(user_id):
                 return
-            res = "{} is afk".format(fst_name)
+            res = "{} is afk since {}".format(fst_name, afk_since)
             update.effective_message.reply_text(res)
         else:
             if int(userc_id) == int(user_id):
                 return
-            res = "{} is afk.\nReason: {}".format(fst_name, user.reason)
+            res = "{} is afk since {}\nReason: {}".format(fst_name, afk_since, user.reason)
             update.effective_message.reply_text(res)
 
+
+def get_readable_time(seconds: int) -> str:
+    count = 0
+    ping_time = ""
+    time_list = []
+    time_suffix_list = ["s", "m", "h", "days"]
+
+    while count < 4:
+        count += 1
+        if count < 3:
+            remainder, result = divmod(seconds, 60)
+        else:
+            remainder, result = divmod(seconds, 24)
+        if seconds == 0 and remainder == 0:
+            break
+        time_list.append(int(result))
+        seconds = int(remainder)
+
+    for x in range(len(time_list)):
+        time_list[x] = str(time_list[x]) + time_suffix_list[x]
+    if len(time_list) == 4:
+        ping_time += time_list.pop() + ", "
+
+    time_list.reverse()
+    ping_time += ":".join(time_list)
+
+    return ping_time
 
 __help__ = """
  • `/afk <reason>`*:* mark yourself as AFK(away from keyboard).
