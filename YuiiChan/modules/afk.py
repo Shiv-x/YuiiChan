@@ -131,7 +131,9 @@ def check_afk(update, context, user_id, fst_name, userc_id):
         else:
             if int(userc_id) == int(user_id):
                 return
-            res = "{} is afk since {}\nReason: {}".format(fst_name, afk_since, user.reason)
+            res = "{} is afk since {}\nReason: {}".format(
+                fst_name, afk_since, user.reason
+            )
             update.effective_message.reply_text(res)
 
 
@@ -161,6 +163,7 @@ def get_readable_time(seconds: int) -> str:
     ping_time += ":".join(time_list)
 
     return ping_time
+
 
 __help__ = """
  • `/afk <reason>`*:* mark yourself as AFK(away from keyboard).
