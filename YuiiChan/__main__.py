@@ -75,18 +75,18 @@ def get_readable_time(seconds: int) -> str:
 
 
 PM_START_TEXT = """
-Hi {}, my name is {}! 
-I am an Anime themed group management bot.
+Hi {}, my name is RealRex! 
+I am a group management bot.
 You can find my list of available commands with /help.
 
-See [Basic Configuration Checklist](https://t.me/yuiichansupport/3654) on how to secure your group.
+See [Join Our GroupChat](https://t.me/+Kr5s9iW9dsIwZDJl) on how to secure your group.
 """
 
 HELP_STRINGS = """
-Hey there! My name is *{}*.
+Hey there! My name is *RealRex*.
 I'm a modular group management bot with a few fun extras! Have a look at the following for an idea of some of \
 the things I can help you with.
-If you have any questions on how to use me, head over to @YuiiChanSupport
+If you have any questions on how to use me, head over to @RexNetwork
 
 *Main* commands available:
  • /start: start the bot
@@ -105,7 +105,7 @@ And the following:
     "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n",
 )
 
-SAITAMA_IMG = "https://telegra.ph/file/69a84b4548087b06afef4.jpg"
+SAITAMA_IMG = "https://telegra.ph/file/4de827a16bfda7157bc9a.jpg"
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
 You can donate to the original writer of the Base code, Paul
@@ -212,7 +212,7 @@ def start(update: Update, context: CallbackContext):
                     [
                         [
                             InlineKeyboardButton(
-                                text="Add Yui-Chan to your group",
+                                text="Add RealRex to your group",
                                 url="t.me/{}?startgroup=true".format(
                                     context.bot.username
                                 ),
